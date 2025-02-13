@@ -39,6 +39,14 @@ jobs:
             docker --version
             docker-compose --version
 
+
+            # Add user to the docker group (fixes permission issue)
+            echo "🔑 Adding user to Docker group..."
+            sudo usermod -aG docker $USER
+            sudo chmod 666 /var/run/docker.sock  # Grant access to Docker socket
+            # Apply changes immediately
+            exec sudo su -l $USER
+
             # Navigate to the project directory and deploy
             cd /home/ubuntu/
             git clone https://github.com/oyerohabib/fastapi-book-project.git
