@@ -40,7 +40,7 @@ jobs:
             docker-compose --version
 
             # Navigate to the project directory and deploy
-            cd /home/ubuntu/
+            cd /home/ec2-user/
             git clone https://github.com/oyerohabib/fastapi-book-project.git
             cd fastapi-book-project/
             git pull
