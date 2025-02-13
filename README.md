@@ -129,6 +129,10 @@ The API includes proper error handling for:
 - Invalid genre types
 - Malformed requests
 
+## Deployment
+
+The application is deployed using Docker and Docker Compose. The deployment process is automated using GitHub Actions, and the application is deployed to an EC2 instance running Ubuntu 22.04.
+
 ## Contributing
 
 1. Fork the repository
