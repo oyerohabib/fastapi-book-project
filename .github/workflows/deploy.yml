@@ -19,37 +19,43 @@ jobs:
             # Update package index and install dependencies
             sudo apt-get update -y
             sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-            # Add Docker's official GPG key
+            
+            # Install Docker
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
             sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-            # Install Docker
             sudo apt-get update -y
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
-            # Add the SSH user to the Docker group
-            sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
-
-            # Install Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-
-            # Verify installations
-            docker --version
-            docker-compose --version
-
-
-            # Add user to the docker group (fixes permission issue)
-            echo "🔑 Adding user to Docker group..."
+            # Add user to Docker group
             sudo usermod -aG docker $USER
             sudo chmod 666 /var/run/docker.sock  # Grant access to Docker socket
-            # Apply changes immediately
-            exec sudo su -l $USER
 
             # Navigate to the project directory and deploy
+            echo "🔑 Navigating to project directory..."
             cd /home/ubuntu/
-            git clone https://github.com/oyerohabib/fastapi-book-project.git
-            cd fastapi-book-project/
+            if [ ! -d "fastapi-book-project" ]; then
+              echo "🔑 Cloning repository..."
+              git clone https://github.com/oyerohabib/fastapi-book-project.git
+            fi
+            cd fastapi-book-project
             git pull
+
+            # Restart Docker & Deploy Containers
+            echo "🔑 Restarting Docker..."
+            sudo systemctl restart docker
+
+            echo "🔑 Stopping any running containers..."
+            docker-compose down  # Stop any running containers
+            echo "🔑 Starting new containers..."
             docker-compose up -d --build
+
+            # Restart nginx after containers are fully up
+            echo "🔑 Restarting nginx..."
+            sleep 5  # Ensure containers are fully up
+            sudo systemctl restart nginx
+
+            # Check Logs
+            echo "🔑 Checking logs..."
+            docker ps -a  # See if anything crashed
+            docker logs fastapi-app  # Check FastAPI logs
+            docker logs fastapi-nginx  # Check nginx logs
