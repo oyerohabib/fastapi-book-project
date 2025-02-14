@@ -38,7 +38,8 @@ jobs:
               git clone https://github.com/oyerohabib/fastapi-book-project.git
             fi
             cd fastapi-book-project
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
 
             # Restart Docker & Deploy Containers
             echo "🔑 Restarting Docker..."
