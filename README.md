@@ -129,6 +129,12 @@ The API includes proper error handling for:
 - Invalid genre types
 - Malformed requests
 
+## Testing
+
+```bash
+pytest
+```
+
 ## Contributing
 
 1. Fork the repository
